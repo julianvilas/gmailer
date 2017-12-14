@@ -11,7 +11,7 @@ func main() {
 	}))
 	svc := ses.New(sess)
 
-	m := mailer.New(svc)
+	m := gmailer.New(svc)
 	err := m.SendRaw(mailer.Email{
 		Subject:     "A fancy email sent with AWS SES",
 		Body:        "Here I'll tell you lovely things.",

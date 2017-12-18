@@ -10,6 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/ses/sesiface"
 )
 
+// Email defines the structure of an email to be sent.
 type Email struct {
 	Subject     string
 	Body        string
@@ -20,14 +21,17 @@ type Email struct {
 	AttachFiles []string
 }
 
+// Mailer is a structure that contains a service that implements the AWS ses interface.
 type Mailer struct {
 	svc sesiface.SESAPI
 }
 
+// New receives a service that implements the AWS ses interface and returns a Mailer associated to it.
 func New(svc sesiface.SESAPI) *Mailer {
 	return &Mailer{svc}
 }
 
+// Send sends the Email.
 func (m Mailer) Send(mail Email) error {
 	input := m.createInput(mail)
 
@@ -39,6 +43,7 @@ func (m Mailer) Send(mail Email) error {
 	return nil
 }
 
+// SendRaw sends the email using RawInput, useful when sending attached files.
 func (m Mailer) SendRaw(mail Email) error {
 	input, err := m.createRawInput(mail)
 	if err != nil {

@@ -1,8 +1,12 @@
 # gmailer
 
-Simple Go library to send emails using AWS SES.
+Simple Go library to send emails using [AWS SES](https://aws.amazon.com/ses/). In order to send the email you need to setup your AWS credentials as specified in the aws-sdk-go [documentation](https://github.com/aws/aws-sdk-go#configuring-credentials).
 
-## Examples
+It has a function to send simple emails `SendEmail` and a function to send raw emails `SendRaw`. The latest is useful for sending emails with attachments.
+
+# Examples
+
+Assuming you have credentials configured in your default shared credentials profile (`~/.aws/credentials`):
 
 ```go
 func main() {
@@ -12,7 +16,7 @@ func main() {
 	svc := ses.New(sess)
 
 	m := gmailer.New(svc)
-	err := m.SendRaw(mailer.Email{
+	err := m.SendRaw(gmailer.Email{
 		Subject:     "A fancy email sent with AWS SES",
 		Body:        "Here I'll tell you lovely things.",
 		From:        "alice@example.com",

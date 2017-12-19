@@ -22,7 +22,7 @@ func main() {
 		Subject:     "A fancy email sent with AWS SES",
 		Body:        "Here I'll tell you lovely things.",
 		From:        "alice@example.com",
-		Dest:        "bob@example.com",
+		Dest:        []string{"bob@example.com"},
 	})
 	if err != nil {
 		log.Panicf("executing sending email:", err)

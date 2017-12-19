@@ -19,9 +19,11 @@ type Email struct {
 	CC          []string
 	BCC         []string
 	AttachFiles []string
+	ConfigSet   string // AWS SES Configuration Set (https://goo.gl/sXr7fj).
+	HTML        bool   // Specifies wheter the content of the email is HTML or Text.
 }
 
-// Mailer is a structure that contains a service that implements the AWS ses interface.
+// Mailer is a structure that contains a service that implements the AWS SES interface.
 type Mailer struct {
 	svc sesiface.SESAPI
 }
@@ -63,6 +65,17 @@ func (m Mailer) createInput(mail Email) *ses.SendEmailInput {
 	ccAdd := convertStringSliceToAWSString(mail.CC)
 	bccAdd := convertStringSliceToAWSString(mail.BCC)
 
+	content := &ses.Content{
+		Charset: aws.String("UTF-8"),
+		Data:    aws.String(mail.Body),
+	}
+	var body *ses.Body
+	if mail.HTML {
+		body = &ses.Body{Html: content}
+	} else {
+		body = &ses.Body{Text: content}
+	}
+
 	return &ses.SendEmailInput{
 		Destination: &ses.Destination{
 			ToAddresses:  toAdd,
@@ -70,18 +83,14 @@ func (m Mailer) createInput(mail Email) *ses.SendEmailInput {
 			BccAddresses: bccAdd,
 		},
 		Message: &ses.Message{
-			Body: &ses.Body{
-				Text: &ses.Content{
-					Charset: aws.String("UTF-8"),
-					Data:    aws.String(mail.Body),
-				},
-			},
+			Body: body,
 			Subject: &ses.Content{
 				Charset: aws.String("UTF-8"),
 				Data:    aws.String(mail.Subject),
 			},
 		},
-		Source: aws.String(mail.From),
+		Source:               aws.String(mail.From),
+		ConfigurationSetName: aws.String(mail.ConfigSet),
 	}
 }
 
@@ -96,7 +105,19 @@ func (m Mailer) createRawInput(mail Email) (*ses.SendRawEmailInput, error) {
 		gm.SetHeader("Bcc", mail.BCC...)
 	}
 	gm.SetHeader("Subject", mail.Subject)
-	gm.SetBody("text/plain", mail.Body)
+
+	if mail.ConfigSet != "" {
+		gm.SetHeader("X-SES-CONFIGURATION-SET", mail.ConfigSet)
+	}
+
+	var contentType string
+	if mail.HTML {
+		contentType = "text/html;charset=UTF-8"
+	} else {
+		contentType = "text/plain;charset=UTF-8"
+	}
+	gm.SetBody(contentType, mail.Body)
+
 	for _, attachment := range mail.AttachFiles {
 		gm.Attach(attachment)
 	}

@@ -20,7 +20,7 @@ type Email struct {
 	BCC         []string
 	AttachFiles []string
 	ConfigSet   string // AWS SES Configuration Set (https://goo.gl/sXr7fj).
-	HTML        bool   // Specifies wheter the content of the email is HTML or Text.
+	HTML        bool   // Specifies whether the content of the email is HTML or Text.
 }
 
 // Mailer is a structure that contains a service that implements the AWS SES interface.

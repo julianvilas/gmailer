@@ -101,7 +101,7 @@ func (m Mailer) createRawInput(mail Email) (*ses.SendRawEmailInput, error) {
 	if len(mail.CC) > 0 {
 		gm.SetHeader("Cc", mail.CC...)
 	}
-	if len(mail.CC) > 0 {
+	if len(mail.BCC) > 0 {
 		gm.SetHeader("Bcc", mail.BCC...)
 	}
 	gm.SetHeader("Subject", mail.Subject)
